@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 
+function listToText(items) {
+  return Array.isArray(items) ? items.map((item) => `- ${item}`).join('\n') : `- ${items}`;
+}
+
 function formatPlanAsText(plan) {
   const meta = [
     `Altersklasse: ${plan.meta.alter}`,
@@ -7,34 +11,30 @@ function formatPlanAsText(plan) {
     `Schwerpunkt: ${plan.meta.schwerpunkt}`,
     `Spieleranzahl: ${plan.meta.spieleranzahl}`,
     `Niveau: ${plan.meta.niveau}`,
+    `Organisation: ${plan.meta.fieldCount}, ${plan.meta.format}`,
     `Material: ${plan.meta.material}`,
   ].join('\n');
 
-  const sections = plan.abschnitte.map((abschnitt, index) => (
-    `${index + 1}. ${abschnitt.name} (${abschnitt.dauer} Minuten)\n` +
-    `Ziel: ${abschnitt.ziel}\n` +
-    `Ablauf: ${abschnitt.ablauf}\n` +
-    `Coachingpunkte: ${abschnitt.coaching}\n` +
-    `Varianten: ${abschnitt.varianten}\n` +
-    `Material: ${abschnitt.material}`
+  const sections = plan.abschnitte.map((section, index) => (
+    `${index + 1}. ${section.dauer} Min - ${section.exerciseName}\n` +
+    `Phase: ${section.phase}\n` +
+    `Ziel: ${section.ziel}\n` +
+    `Organisation: ${section.organisation}\n` +
+    `Coachingpunkte:\n${listToText(section.coachingPoints)}\n` +
+    `Varianten:\n${listToText(section.varianten)}\n` +
+    `Material: ${section.material}`
   ));
 
   return (
     `Fußball Training AI - Trainingsplan\n\n${meta}\n\n${sections.join('\n\n')}` +
-    `\n\nTrainer-Notiz\nWorauf achte ich heute besonders?\n${plan.trainerNote}`
+    `\n\nTrainer-Notiz\n${plan.trainerNote}`
   );
 }
 
-/**
- * Präsentiert den generierten Trainingsplan in einer übersichtlichen Form.
- * Jeder Abschnitt wird mit den wichtigsten Informationen dargestellt. Für
- * größere Bildschirme werden Dauer und Abschnittsnamen hervorgehoben;
- * auf kleinen Bildschirmen ordnen sich die Karten automatisch untereinander an.
- */
 export default function TrainingPlan({ plan, onRegenerate }) {
   const [copyState, setCopyState] = useState('idle');
 
-  const handleCopy = async () => {
+  async function handleCopy() {
     try {
       await navigator.clipboard.writeText(formatPlanAsText(plan));
       setCopyState('copied');
@@ -42,75 +42,96 @@ export default function TrainingPlan({ plan, onRegenerate }) {
     } catch {
       setCopyState('error');
     }
-  };
+  }
 
-  const handlePrint = () => {
+  function handlePrint() {
     window.print();
-  };
+  }
 
   return (
-    <section className="plan-section">
+    <section className="plan-section printable-plan">
       <div className="plan-topbar">
-        <div className="section-heading">
-          <span className="section-kicker">Schritt 2</span>
+        <div>
+          <span className="section-kicker">Session-Flow</span>
           <h2>Dein Trainingsplan</h2>
-          <p>{plan.meta.ageLabel} · {plan.meta.schwerpunkt} · {plan.meta.totalMinutes} Minuten</p>
+          <p>{plan.meta.ageLabel}</p>
         </div>
-        <div className="plan-actions">
-          <button type="button" className="secondary-button" onClick={onRegenerate}>
-            Neuen Beispielplan erstellen
-          </button>
+        <div className="plan-actions no-print">
+          <button type="button" className="secondary-button" onClick={onRegenerate}>Beispiel variieren</button>
           <button type="button" className="secondary-button" onClick={handleCopy}>
             {copyState === 'copied' ? 'Text kopiert' : 'Plan als Text kopieren'}
           </button>
-          <button type="button" className="secondary-button print-button" onClick={handlePrint}>
-            Drucken / PDF speichern
-          </button>
+          <button type="button" className="secondary-button print-button" onClick={handlePrint}>Drucken / PDF</button>
         </div>
       </div>
 
-      {copyState === 'error' && (
-        <p className="copy-error">Kopieren ist hier nicht verfügbar.</p>
-      )}
+      {copyState === 'error' ? <p className="copy-error no-print">Kopieren ist hier nicht verfügbar.</p> : null}
 
-      <div className="plan-meta" aria-label="Trainingsdaten">
-        <span><strong>Altersklasse</strong>{plan.meta.alter}</span>
-        <span><strong>Dauer</strong>{plan.meta.totalMinutes} min</span>
-        <span><strong>Spieler</strong>{plan.meta.spieleranzahl}</span>
-        <span><strong>Niveau</strong>{plan.meta.niveau}</span>
+      <div className="session-preview">
+        <span><strong>{plan.meta.alter}</strong> Altersklasse</span>
+        <span><strong>{plan.meta.schwerpunkt}</strong> Schwerpunkt</span>
+        <span><strong>{plan.meta.totalMinutes} min</strong> Dauer</span>
+        <span><strong>{plan.meta.fieldCount}</strong> Organisation</span>
       </div>
 
-      <div className="plan-cards">
-        {plan.abschnitte.map((abschnitt, index) => (
-          <article key={abschnitt.name} className="plan-card">
-            <header className="plan-card-header">
-              <div>
-                <span className="step-number">{index + 1}</span>
-                <h3>{abschnitt.name}</h3>
+      <div className="timeline">
+        {plan.abschnitte.map((section, index) => (
+          <article key={`${section.phase}-${section.exerciseName}`} className="timeline-item">
+            <div className="timeline-marker">
+              <span>{index + 1}</span>
+            </div>
+
+            <div className="timeline-card">
+              <header className="timeline-header">
+                <div>
+                  <span className="phase-label">{section.phase}</span>
+                  <h3>{section.exerciseName}</h3>
+                </div>
+                <span className="duration-badge">{section.dauer} min</span>
+              </header>
+
+              <div className="quick-grid">
+                <div>
+                  <span className="micro-label">Ziel</span>
+                  <p>{section.ziel}</p>
+                </div>
+                <div>
+                  <span className="micro-label">Organisation</span>
+                  <p>{section.organisation}</p>
+                </div>
               </div>
-              <span className="duration">{abschnitt.dauer} min</span>
-            </header>
-            <div className="plan-card-content">
-              <div>
-                <strong>Ziel</strong>
-                <p>{abschnitt.ziel}</p>
+
+              <div className="coaching-box">
+                <span className="micro-label">Coachings</span>
+                <ul>
+                  {section.coachingPoints.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
               </div>
-              <div>
-                <strong>Ablauf</strong>
-                <p>{abschnitt.ablauf}</p>
+
+              <div className="material-line">
+                <span>Material</span>
+                <p>{section.material}</p>
               </div>
-              <div>
-                <strong>Coachingpunkte</strong>
-                <p>{abschnitt.coaching}</p>
-              </div>
-              <div>
-                <strong>Varianten</strong>
-                <p>{abschnitt.varianten}</p>
-              </div>
-              <div>
-                <strong>Material</strong>
-                <p>{abschnitt.material || 'Keine Angabe'}</p>
-              </div>
+
+              <details className="detail-panel">
+                <summary>Ablauf, Varianten und Trainerhinweis</summary>
+                <div className="detail-grid">
+                  <div>
+                    <strong>Ablauf</strong>
+                    <p>{section.ablauf}</p>
+                  </div>
+                  <div>
+                    <strong>Varianten</strong>
+                    <ul>
+                      {(Array.isArray(section.varianten) ? section.varianten : [section.varianten]).map((variant) => (
+                        <li key={variant}>{variant}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </details>
             </div>
           </article>
         ))}
@@ -118,7 +139,7 @@ export default function TrainingPlan({ plan, onRegenerate }) {
 
       <aside className="trainer-note">
         <span className="section-kicker">Trainer-Notiz</span>
-        <h3>Worauf achte ich heute besonders?</h3>
+        <h3>Worauf achte ich heute?</h3>
         <p>{plan.trainerNote}</p>
       </aside>
     </section>

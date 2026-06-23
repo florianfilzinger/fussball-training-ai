@@ -1,72 +1,113 @@
 import React, { useState } from 'react';
 
-/**
- * Das Formular sammelt die Daten für den Trainingsplan. Es besteht aus
- * Dropdowns und Texteingaben, sodass Trainer mit wenigen Klicks ihre
- * Parameter wählen können. Beim Absenden wird der Zustand nach oben
- * gereicht, wo der Trainingsplan generiert wird.
- */
+const presets = [
+  {
+    label: 'U9 Dribbling',
+    values: {
+      alter: 'U9',
+      dauer: '75',
+      schwerpunkt: 'Dribbling',
+      spieleranzahl: '10',
+      niveau: 'Einsteiger',
+      material: 'Bälle, Hütchen, Markierungsteller, 4 Minitore',
+    },
+  },
+  {
+    label: 'U11 Passspiel',
+    values: {
+      alter: 'U11',
+      dauer: '90',
+      schwerpunkt: 'Passspiel',
+      spieleranzahl: '14',
+      niveau: 'Fortgeschritten',
+      material: 'Bälle, Hütchen, Leibchen, 4 Minitore',
+    },
+  },
+  {
+    label: 'U13 Umschalten',
+    values: {
+      alter: 'U13',
+      dauer: '90',
+      schwerpunkt: 'Umschalten',
+      spieleranzahl: '18',
+      niveau: 'Fortgeschritten',
+      material: 'Bälle, Hütchen, Leibchen, 2 Großtore, 4 Minitore',
+    },
+  },
+];
+
+const defaultValues = {
+  alter: 'U9',
+  dauer: '90',
+  schwerpunkt: 'Passspiel',
+  spieleranzahl: '10',
+  niveau: 'Einsteiger',
+  material: 'Bälle, Hütchen, Markierungsteller',
+};
+
 export default function TrainingForm({ onGenerate }) {
-  const [alter, setAlter] = useState('U9');
-  const [dauer, setDauer] = useState('90');
-  const [schwerpunkt, setSchwerpunkt] = useState('Passspiel');
-  const [spieleranzahl, setSpieleranzahl] = useState('8');
-  const [niveau, setNiveau] = useState('Einsteiger');
-  const [material, setMaterial] = useState('Bälle, Hütchen, Markierungsteller');
+  const [form, setForm] = useState(defaultValues);
   const [errors, setErrors] = useState({});
 
-  const validate = () => {
+  function updateField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function applyPreset(values) {
+    setForm(values);
+    setErrors({});
+    onGenerate(values);
+  }
+
+  function validate() {
     const nextErrors = {};
 
-    if ((parseInt(dauer, 10) || 0) < 30) {
-      nextErrors.dauer = 'Die Trainingsdauer muss mindestens 30 Minuten betragen.';
+    if ((parseInt(form.dauer, 10) || 0) < 30) {
+      nextErrors.dauer = 'Mindestens 30 Minuten.';
     }
 
-    if ((parseInt(spieleranzahl, 10) || 0) < 4) {
-      nextErrors.spieleranzahl = 'Die Spieleranzahl muss mindestens 4 betragen.';
+    if ((parseInt(form.spieleranzahl, 10) || 0) < 4) {
+      nextErrors.spieleranzahl = 'Mindestens 4 Spieler.';
     }
 
-    if (!material.trim()) {
-      nextErrors.material = 'Bitte gib mindestens ein verfügbares Material an.';
+    if (!form.material.trim()) {
+      nextErrors.material = 'Bitte Material eintragen.';
     }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
-  };
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  function handleSubmit(event) {
+    event.preventDefault();
     if (!validate()) return;
-
-    onGenerate({
-      alter,
-      dauer,
-      schwerpunkt,
-      spieleranzahl,
-      niveau,
-      material: material.trim(),
-    });
-  };
+    onGenerate({ ...form, material: form.material.trim() });
+  }
 
   return (
-    <section className="form-section">
-      <div className="section-heading">
-        <span className="section-kicker">Schritt 1</span>
-        <h2>Training planen</h2>
-        <p>Wähle Team, Zeit, Schwerpunkt und Material.</p>
+    <section className="builder-card no-print">
+      <div className="builder-head">
+        <span className="section-kicker">Trainings-Builder</span>
+        <h2>Training in wenigen Klicks planen</h2>
+        <p>Team wählen, Schwerpunkt setzen, Material prüfen. Der Plan wird lokal im Browser erzeugt.</p>
       </div>
+
+      <div className="preset-row" aria-label="Schnell-Presets">
+        {presets.map((preset) => (
+          <button key={preset.label} type="button" className="preset-button" onClick={() => applyPreset(preset.values)}>
+            {preset.label}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="training-form" noValidate>
-        <fieldset>
+        <fieldset className="builder-group">
           <legend>Team</legend>
           <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="alter">Altersklasse</label>
-              <select
-                id="alter"
-                value={alter}
-                onChange={(e) => setAlter(e.target.value)}
-              >
+            <label className="form-group" htmlFor="alter">
+              <span>Altersklasse</span>
+              <select id="alter" value={form.alter} onChange={(event) => updateField('alter', event.target.value)}>
                 <option value="U7">U7</option>
                 <option value="U9">U9</option>
                 <option value="U11">U11</option>
@@ -74,98 +115,79 @@ export default function TrainingForm({ onGenerate }) {
                 <option value="U15">U15</option>
                 <option value="U17">U17</option>
               </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="dauer">Trainingsdauer</label>
-              <input
-                type="number"
-                id="dauer"
-                min="30"
-                step="5"
-                value={dauer}
-                onChange={(e) => {
-                  setDauer(e.target.value);
-                  setErrors((current) => ({ ...current, dauer: undefined }));
-                }}
-                aria-invalid={Boolean(errors.dauer)}
-                aria-describedby={errors.dauer ? 'dauer-error' : undefined}
-              />
-              <small>Minuten, mindestens 30</small>
-              {errors.dauer && (
-                <p className="form-error" id="dauer-error">{errors.dauer}</p>
-              )}
-            </div>
-            <div className="form-group">
-              <label htmlFor="spieleranzahl">Spieleranzahl</label>
+            </label>
+
+            <label className="form-group" htmlFor="spieleranzahl">
+              <span>Spieler</span>
               <input
                 type="number"
                 id="spieleranzahl"
                 min="4"
                 max="24"
-                value={spieleranzahl}
-                onChange={(e) => {
-                  setSpieleranzahl(e.target.value);
-                  setErrors((current) => ({ ...current, spieleranzahl: undefined }));
-                }}
+                value={form.spieleranzahl}
+                onChange={(event) => updateField('spieleranzahl', event.target.value)}
                 aria-invalid={Boolean(errors.spieleranzahl)}
-                aria-describedby={errors.spieleranzahl ? 'spieleranzahl-error' : undefined}
               />
-              {errors.spieleranzahl && (
-                <p className="form-error" id="spieleranzahl-error">{errors.spieleranzahl}</p>
-              )}
-            </div>
+              {errors.spieleranzahl ? <small className="form-error">{errors.spieleranzahl}</small> : null}
+            </label>
+
+            <label className="form-group" htmlFor="dauer">
+              <span>Dauer</span>
+              <input
+                type="number"
+                id="dauer"
+                min="30"
+                step="5"
+                value={form.dauer}
+                onChange={(event) => updateField('dauer', event.target.value)}
+                aria-invalid={Boolean(errors.dauer)}
+              />
+              {errors.dauer ? <small className="form-error">{errors.dauer}</small> : <small>Minuten</small>}
+            </label>
           </div>
         </fieldset>
 
-        <fieldset>
-          <legend>Inhalt</legend>
+        <fieldset className="builder-group">
+          <legend>Trainingsziel</legend>
           <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="schwerpunkt">Schwerpunkt</label>
-              <select
-                id="schwerpunkt"
-                value={schwerpunkt}
-                onChange={(e) => setSchwerpunkt(e.target.value)}
-              >
+            <label className="form-group" htmlFor="schwerpunkt">
+              <span>Schwerpunkt</span>
+              <select id="schwerpunkt" value={form.schwerpunkt} onChange={(event) => updateField('schwerpunkt', event.target.value)}>
                 <option value="Passspiel">Passspiel</option>
                 <option value="Dribbling">Dribbling</option>
                 <option value="Torabschluss">Torabschluss</option>
                 <option value="Umschalten">Umschalten</option>
                 <option value="Koordination">Koordination</option>
               </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="niveau">Leistungsniveau</label>
-              <select
-                id="niveau"
-                value={niveau}
-                onChange={(e) => setNiveau(e.target.value)}
-              >
+            </label>
+
+            <label className="form-group" htmlFor="niveau">
+              <span>Niveau</span>
+              <select id="niveau" value={form.niveau} onChange={(event) => updateField('niveau', event.target.value)}>
                 <option value="Einsteiger">Einsteiger</option>
                 <option value="Fortgeschritten">Fortgeschritten</option>
                 <option value="Leistung">Leistung</option>
               </select>
-            </div>
-            <div className="form-group form-group-wide">
-              <label htmlFor="material">Verfügbare Materialien</label>
-              <input
-                type="text"
-                id="material"
-                value={material}
-                onChange={(e) => {
-                  setMaterial(e.target.value);
-                  setErrors((current) => ({ ...current, material: undefined }));
-                }}
-                aria-invalid={Boolean(errors.material)}
-                aria-describedby={errors.material ? 'material-error' : undefined}
-              />
-              {errors.material && (
-                <p className="form-error" id="material-error">{errors.material}</p>
-              )}
-            </div>
+            </label>
           </div>
         </fieldset>
-        <button type="submit" className="submit-button">Trainingsplan erstellen</button>
+
+        <fieldset className="builder-group">
+          <legend>Material</legend>
+          <label className="form-group" htmlFor="material">
+            <span>Verfügbar am Platz</span>
+            <input
+              type="text"
+              id="material"
+              value={form.material}
+              onChange={(event) => updateField('material', event.target.value)}
+              aria-invalid={Boolean(errors.material)}
+            />
+            {errors.material ? <small className="form-error">{errors.material}</small> : null}
+          </label>
+        </fieldset>
+
+        <button type="submit" className="submit-button">Training erstellen</button>
       </form>
     </section>
   );

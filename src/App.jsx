@@ -2,145 +2,162 @@ import React, { useState } from 'react';
 import TrainingForm from './components/TrainingForm.jsx';
 import TrainingPlan from './components/TrainingPlan.jsx';
 
-const focusTemplates = {
-  Passspiel: {
-    simple: {
-      ziel: 'Pass zum Mitspieler bringen und den ersten Kontakt in Spielrichtung mitnehmen',
-      ablauf: 'Dreiecke mit Hütchen aufbauen. Spieler passen, nehmen den Ball seitlich mit und laufen dem Pass nach. Nach drei Pässen geht der Ball durch ein Hütchentor.',
-      coaching: 'Vor dem Pass kurz hochschauen. Standbein zeigt zum Ziel. Erster Kontakt raus aus den Füßen und in den freien Raum.',
-      varianten: 'Abstand verkürzen. Schwachen Fuß einbauen. Nach dem Pass sofort neuen Winkel anbieten.',
-    },
-    advanced: {
-      ziel: 'Passwinkel, Vororientierung und Anschlussaktion unter Druck verbessern',
-      ablauf: '4 gegen 2 im Rechteck. Nach sechs Pässen darf ein Zieltor angespielt werden. Ballgewinn: Verteidiger kontern auf zwei Minitoren.',
-      coaching: 'Schulterblick vor der Annahme. Offene Stellung zum Feld. Pass scharf in den richtigen Fuß. Nach dem Abspiel sofort freilaufen.',
-      varianten: 'Zwei Kontakte. Joker an einer Seitenlinie. Feld enger machen. Zieltor nur nach Klatschball öffnen.',
-    },
-  },
-  Dribbling: {
-    simple: {
-      ziel: 'Ball eng führen, Richtungen wechseln und mutig ins freie Tor dribbeln',
-      ablauf: 'Dribbelgarten mit vielen Hütchentoren. Jeder Spieler hat einen Ball und sammelt Tore. Nach jedem Tor Richtung und Tempo wechseln.',
-      coaching: 'Ball nah am Fuß. Viele kleine Kontakte. Kopf nach jedem zweiten Kontakt heben. Nach der Finte sofort beschleunigen.',
-      varianten: 'Nur linker oder rechter Fuß. Farbsignal für nächstes Tor. Partner als Schattenläufer.',
-    },
-    advanced: {
-      ziel: '1 gegen 1 gezielt lösen und danach schnell abschließen oder passen',
-      ablauf: 'Angreifer startet seitlich, Verteidiger frontal. Ziel sind zwei Minitoren. Nach dem Duell kommt sofort der nächste Ball.',
-      coaching: 'Mit Tempo andribbeln. Finte vor dem Abstand zum Gegner. Körper zwischen Ball und Gegner bringen. Nach dem Vorbeigehen Tempo aufnehmen.',
-      varianten: 'Zeitlimit setzen. Verteidiger näher starten lassen. Bonuspunkt für klar erkennbare Finte.',
-    },
-  },
-  Torabschluss: {
-    simple: {
-      ziel: 'Aus kurzer Distanz sauber aufs Tor abschließen',
-      ablauf: 'Pass vom Trainer oder Mitspieler. Erster Kontakt in Schussrichtung. Abschluss auf markierte Ecken. Danach Ball holen und Position wechseln.',
-      coaching: 'Standbein neben den Ball. Fußspitze zum Ziel. Oberkörper leicht über den Ball. Vor dem Schuss kurz Ziel wählen.',
-      varianten: 'Links und rechts im Wechsel. Abschluss nach kurzem Dribbling. Zielecken mit Zusatzpunkten.',
-    },
-    advanced: {
-      ziel: 'Nach Voraktion unter Druck schnell und präzise abschließen',
-      ablauf: 'Pass auf Wandspieler, Tiefenlauf, Ballmitnahme und Abschluss. Ein Verteidiger setzt nach und erzwingt Tempo.',
-      coaching: 'Laufweg vor dem Pass starten. Erster Kontakt Richtung Tor. Torwart kurz wahrnehmen. Nachschuss aktiv suchen.',
-      varianten: 'Direktabschluss. Abschlusszone begrenzen. Zweiten Ball für Rebound einspielen.',
-    },
-  },
-  Umschalten: {
-    simple: {
-      ziel: 'Nach Ballgewinn schnell nach vorne spielen und nach Ballverlust sofort stören',
-      ablauf: '3 gegen 3 mit zwei Zielspielern. Nach Ballgewinn muss in fünf Sekunden ein Zielspieler angespielt werden.',
-      coaching: 'Erster Blick nach vorne. Ballnah sofort Druck machen. Neben dem Ball kurze Passwege schließen.',
-      varianten: 'Zeit auf acht Sekunden erhöhen. Zielspieler als Joker nutzen. Feld kleiner machen.',
-    },
-    advanced: {
-      ziel: 'Ballgewinn und Ballverlust als Team sofort erkennen und nutzen',
-      ablauf: '4 gegen 4 auf vier Tore. Ein Tor zählt doppelt nach Vertikalpass oder schnellem Dribbling in die Tiefe.',
-      coaching: 'Ballnah attackieren. Ballfern absichern. Erster Pass nach Ballgewinn nach vorne. Restverteidigung aktiv halten.',
-      varianten: 'Acht-Sekunden-Regel. Umschaltzone markieren. Kurzzeitige Unterzahl nach Ballverlust.',
-    },
-  },
-  Koordination: {
-    simple: {
-      ziel: 'Fußarbeit, Gleichgewicht und Ballgefühl verbessern',
-      ablauf: 'Parcours mit Leiter, Hütchen und Ballstation. Nach jeder Laufaufgabe folgt ein Pass, eine Ballmitnahme oder ein kurzes Dribbling.',
-      coaching: 'Leise und schnelle Füße. Knie leicht beugen. Nach der Bewegung den Ball mit dem ersten Kontakt kontrollieren.',
-      varianten: 'Parcours spiegeln. Partneraufgaben. Verschiedene Farben als Startsignal.',
-    },
-    advanced: {
-      ziel: 'Koordination mit Ballmitnahme, Pass und Anschlussaktion verbinden',
-      ablauf: 'Leiter, Richtungswechsel, Ballmitnahme und Pass in ein Zieltor. Zwei Gruppen arbeiten parallel mit kurzen Wartezeiten.',
-      coaching: 'Explosiver erster Schritt. Körper tief beim Richtungswechsel. Nach Belastung trotzdem sauber passen.',
-      varianten: 'Reaktionssignal. Gegnerdruck nach der Leiter. Technikbonus im Wettbewerb.',
-    },
-  },
-};
-
 const ageProfiles = {
   U7: {
-    label: 'spielerisch und kurz',
+    label: 'spielerisch, kurz und mit vielen Ballkontakten',
     mode: 'playful',
-    hint: 'kurz vormachen, schnell spielen lassen, wenig warten lassen',
-    mainFormat: '1 gegen 1, 2 gegen 1 oder kleine Stationen mit einem klaren Ziel',
-    game: '3 gegen 3 oder 4 gegen 4 mit vielen Ballaktionen',
-    intensity: 'kurze Belastungen, viele Pausen mit Ball und einfache Sprache',
+    coachingTone: ['Kurz vormachen', 'Alle Kinder mit Ball', 'Wenig erklären'],
+    fieldHint: 'kleines Feld, viele Tore, einfache Regeln',
+    gameFormat: '3 gegen 3 auf vier Hütchentore',
   },
   U9: {
-    label: 'spielerisch mit einfachen Regeln',
+    label: 'spielerisch mit klaren Mini-Aufgaben',
     mode: 'playful',
-    hint: 'klare Bilder nutzen, Aufgaben kurz halten, viele Erfolgserlebnisse schaffen',
-    mainFormat: '2 gegen 1, 3 gegen 2 oder kleine Wettbewerbe mit einfachen Punkten',
-    game: '4 gegen 4 mit Hütchentoren und Zusatzpunkten für mutige Aktionen',
-    intensity: 'spielerisch steigern und Wartezeiten konsequent kurz halten',
+    coachingTone: ['Viele Ballkontakte', 'Mutige Aktionen loben', 'Schnell wieder spielen'],
+    fieldHint: 'zwei kleine Felder oder ein Dribbelgarten mit vielen Zielen',
+    gameFormat: '4 gegen 4 mit Bonuspunkt für Schwerpunktaktion',
   },
   U11: {
     label: 'technisch strukturiert mit ersten Entscheidungen',
     mode: 'technical',
-    hint: 'Technik vormachen, sauber wiederholen und dann ins Duell bringen',
-    mainFormat: 'Technikstation plus 2 gegen 1 oder 3 gegen 2 mit klarer Anschlussaktion',
-    game: '5 gegen 5 mit Zielzonen und klarer Schwerpunktregel',
-    intensity: 'gleichmäßiger Übungsrhythmus mit kurzen Coachingstopps',
+    coachingTone: ['Saubere Technik', 'Erster Blick nach vorne', 'Entscheidung abfragen'],
+    fieldHint: 'zwei Gruppen parallel, klare Rotationen, kurze Wartezeiten',
+    gameFormat: '5 gegen 5 mit Zielzonen oder Minitoren',
   },
   U13: {
-    label: 'technisch strukturiert und spielnah',
+    label: 'spielnah, technisch sauber und entscheidungsorientiert',
     mode: 'technical',
-    hint: 'spielnah üben, Entscheidungen abfragen und Technik gezielt korrigieren',
-    mainFormat: '3 gegen 2, 4 gegen 3 oder Rondos mit Anschluss in Zielzonen',
-    game: '6 gegen 6 mit Joker oder Zielzonen',
-    intensity: 'saubere Technik unter moderatem Gegnerdruck einfordern',
+    coachingTone: ['Vororientierung', 'Aktion unter Gegnerdruck', 'Nach Aktion sofort anbieten'],
+    fieldHint: 'zwei Felder mit Rotationsspieler oder Joker',
+    gameFormat: '6 gegen 6 mit Joker und Schwerpunktregel',
   },
   U15: {
-    label: 'spielnah und taktisch klar',
+    label: 'taktischer, intensiver und gruppenbezogen',
     mode: 'tactical',
-    hint: 'Positionen einbeziehen, intensiv spielen lassen, kurz und klar coachen',
-    mainFormat: '4 gegen 4 plus Joker, Zonenspiel oder gruppentaktische Spielform',
-    game: '7 gegen 7 auf kompaktem Feld mit taktischer Zusatzregel',
-    intensity: 'intensive Spielphasen mit aktiver Restverteidigung und klarer Rollenverteilung',
+    coachingTone: ['Tempo hochhalten', 'Abstände coachen', 'Trigger klar benennen'],
+    fieldHint: 'kompaktes Spielfeld mit Zonen, Gegnerdruck und klaren Rollen',
+    gameFormat: '7 gegen 7 mit Umschalt- oder Zielzonenregel',
   },
   U17: {
-    label: 'intensiv und wettkampfnah',
+    label: 'wettkampfnah mit Tempo, Druck und klaren Auslösern',
     mode: 'tactical',
-    hint: 'hohes Tempo fordern, kurz korrigieren, echte Spielsituationen nutzen',
-    mainFormat: 'positionsbezogene Spielform mit Umschaltmomenten und Zeitdruck',
-    game: '8 gegen 8 oder 9 gegen 9 mit Spielphasen und Umschaltaufgaben',
-    intensity: 'wettkampfnahes Tempo, klare taktische Trigger und kurze präzise Korrekturen',
+    coachingTone: ['Höchstes Tempo', 'Restverteidigung sichern', 'Gruppentaktik konkret korrigieren'],
+    fieldHint: 'positionsnahes Feld, hohe Intensität, kurze Coachingstopps',
+    gameFormat: '8 gegen 8 oder 9 gegen 9 mit klarer Spielphase',
   },
 };
 
-const sectionNames = ['Aufwärmen', 'Hauptteil 1', 'Hauptteil 2', 'Spielform', 'Abschluss'];
+const focusLibrary = {
+  Passspiel: {
+    warmup: {
+      playful: 'Pass-Jagd durch Hütchentore',
+      technical: 'Passdreieck mit Auftaktbewegung',
+      tactical: 'Rondo-Aktivierung mit Spiel über den Dritten',
+    },
+    technique: {
+      playful: 'Hütchentor-Passen mit Farbkommando',
+      technical: 'Passdreieck mit Klatsch und Tiefenlauf',
+      tactical: 'Positionsrondo 4 plus 2 gegen 2',
+    },
+    game: {
+      playful: '4-Tore-Spiel mit Passbonus',
+      technical: '5 gegen 5 über den Dritten',
+      tactical: '7 gegen 7 mit Vertikalpass-Regel',
+    },
+    points: ['Passfuß fest machen', 'Erster Kontakt in Spielrichtung', 'Freilaufen nach dem Pass', 'Freien Spieler früh erkennen', 'Pass scharf in den richtigen Fuß'],
+    goals: ['Passqualität sichern', 'Ersten Kontakt verbessern', 'Freilaufen und Anschlussaktion verbinden'],
+    variants: ['Maximal zwei Kontakte', 'Bonuspunkt nach Direktspiel', 'Feld enger machen', 'Joker als Wandspieler nutzen'],
+  },
+  Dribbling: {
+    warmup: {
+      playful: 'Farb-Reaktionsspiel mit Ball',
+      technical: 'Dribbelgarten mit Richtungswechsel',
+      tactical: '1-gegen-1-Aktivierung aus seitlichem Start',
+    },
+    technique: {
+      playful: 'Hütchentore-Dribbling',
+      technical: 'Finte und Tempo durch zwei Tore',
+      tactical: '1 gegen 1 mit Anschlussaktion',
+    },
+    game: {
+      playful: 'Dribbelkönig auf vier Tore',
+      technical: '3 gegen 3 mit Dribbelzone',
+      tactical: '5 gegen 5 mit Andribbel-Trigger',
+    },
+    points: ['Ball eng am Fuß', 'Kopf nach vorne heben', 'Richtungswechsel explosiv', 'Finte vor dem Gegner', 'Nach dem Gegner Tempo aufnehmen'],
+    goals: ['Enge Ballführung verbessern', 'Mutige 1-gegen-1-Aktionen fördern', 'Nach der Finte beschleunigen'],
+    variants: ['Nur schwacher Fuß', 'Zeitlimit pro Aktion', 'Verteidiger startet näher', 'Bonuspunkt für klare Finte'],
+  },
+  Torabschluss: {
+    warmup: {
+      playful: 'Zielschuss-Challenge nach Dribbling',
+      technical: 'Torschuss nach erstem Kontakt',
+      tactical: 'Abschluss-Aktivierung nach Tiefenlauf',
+    },
+    technique: {
+      playful: 'Schusskorridor mit Zielecken',
+      technical: 'Torabschluss nach Doppelpass',
+      tactical: 'Abschluss unter Gegnerdruck',
+    },
+    game: {
+      playful: '4 gegen 4 mit Abschlusszone',
+      technical: '3 gegen 2 auf Torabschluss',
+      tactical: '6 gegen 6 mit Abschlussfenster',
+    },
+    points: ['Vor dem Schuss Ziel wählen', 'Erster Kontakt Richtung Tor', 'Standbein neben den Ball', 'Nachsetzen', 'Timing vor Tempo'],
+    goals: ['Schusstechnik stabilisieren', 'Abschluss nach Voraktion trainieren', 'Schnell unter Druck abschließen'],
+    variants: ['Direktabschluss', 'Nur nach Doppelpass', 'Nachschuss zählt doppelt', 'Abschlusszone verkleinern'],
+  },
+  Umschalten: {
+    warmup: {
+      playful: 'Farbwechsel-Fangspiel mit Ball',
+      technical: 'Ballgewinn-Sprint auf Minitor',
+      tactical: 'Gegenpressing-Aktivierung 4 gegen 2',
+    },
+    technique: {
+      playful: '3 gegen 2 nach Ballklau',
+      technical: '4 gegen 3 Umschalten auf Minitore',
+      tactical: 'Umschaltspiel 5 gegen 5',
+    },
+    game: {
+      playful: '4 gegen 4 mit Ballgewinn-Bonus',
+      technical: '5 gegen 5 mit 6-Sekunden-Regel',
+      tactical: '7 gegen 7 mit Umschaltregel',
+    },
+    points: ['Erster Blick nach vorne', 'Nach Ballverlust sofort Druck auf den Ball', 'Erster Pass nach Ballgewinn', 'Schnell nachrücken', 'Ballnah attackieren'],
+    goals: ['Ballgewinn schnell nutzen', 'Nach Ballverlust direkt reagieren', 'Gemeinsam nachrücken'],
+    variants: ['6-Sekunden-Regel', 'Kontertore zählen doppelt', 'Umschaltzone markieren', 'Ballverlust erzeugt Sofortdruck'],
+  },
+  Koordination: {
+    warmup: {
+      playful: 'Koordinations-Memory mit Ball',
+      technical: 'Leiter, Ballmitnahme und Pass',
+      tactical: 'Reaktionsparcours mit Anschlussentscheidung',
+    },
+    technique: {
+      playful: 'Insel-Parcours mit Ballaufgaben',
+      technical: 'Koordinationsparcours mit Zielpass',
+      tactical: 'Reaktionslauf mit Spielverlagerung',
+    },
+    game: {
+      playful: 'Bewegungsduell auf Hütchentore',
+      technical: '3 gegen 3 mit Reaktionsstart',
+      tactical: '5 gegen 5 mit Signalwechsel',
+    },
+    points: ['Schnelle Füße', 'Rhythmus halten', 'Nach Bewegung Ball kontrollieren', 'Körper tief beim Richtungswechsel', 'Auf Signal sofort reagieren'],
+    goals: ['Laufkoordination verbessern', 'Ballkoordination verbinden', 'Reaktion und Beweglichkeit trainieren'],
+    variants: ['Farbsignal wechseln', 'Parcours spiegeln', 'Partneraufgabe', 'Technikbonus vergeben'],
+  },
+};
 
-function splitPlayers(count) {
-  const players = parseInt(count, 10) || 8;
-  const teamA = Math.max(2, Math.floor(players / 2));
-  const teamB = Math.max(2, players - teamA);
-  return `${teamA} gegen ${teamB}`;
-}
+const phaseLabels = ['Aktivierung', 'Technikblock', 'Spielform 1', 'Spielform 2', 'Cool-down'];
 
 function getDurations(totalMinutes) {
   const safeTotal = Math.max(30, totalMinutes);
-  const weights = [0.18, 0.25, 0.25, 0.22, 0.1];
+  const weights = [0.16, 0.24, 0.25, 0.25, 0.1];
   const durations = weights.map((weight) => Math.max(5, Math.round(safeTotal * weight)));
   let difference = safeTotal - durations.reduce((sum, value) => sum + value, 0);
-  const adjustmentOrder = [1, 2, 3, 0, 4];
+  const adjustmentOrder = [2, 3, 1, 0, 4];
 
   while (difference !== 0) {
     for (const index of adjustmentOrder) {
@@ -158,44 +175,106 @@ function getDurations(totalMinutes) {
   return durations;
 }
 
-function getTemplateForAge(focus, ageProfile) {
-  if (ageProfile.mode === 'tactical') return focus.advanced;
+function getPlayerOrganisation(count, ageProfile) {
+  const players = parseInt(count, 10) || 10;
 
-  if (ageProfile.mode === 'technical') {
+  if (players <= 8) {
     return {
-      ...focus.simple,
-      ziel: `${focus.simple.ziel} und als feste Technikaktion sicher wiederholen`,
-      ablauf: `${focus.simple.ablauf} Danach folgt eine Anschlussaktion mit Gegner oder Zielzone.`,
-      coaching: `${focus.simple.coaching} Erst sauber, dann schneller. Gegnerdruck Schritt für Schritt erhöhen.`,
-      varianten: `${focus.simple.varianten} Am Ende in eine kleine Spielform übertragen.`,
+      label: 'Kleine Gruppe',
+      setup: `${players} Spieler: ein kleines Feld, viele Wiederholungen, kurze Wege. Nutze 2 gegen 2 oder 3 gegen 3 und rotiere nach jeder Aktion.`,
+      fieldCount: '1 Feld',
+      format: ageProfile.mode === 'playful' ? '2 gegen 2 / 3 gegen 3' : '3 gegen 3 plus Joker',
+    };
+  }
+
+  if (players <= 14) {
+    return {
+      label: 'Zwei Gruppen',
+      setup: `${players} Spieler: zwei Gruppen parallel aufbauen. Rotationsspieler einplanen, damit jeder nach kurzer Pause wieder aktiv ist.`,
+      fieldCount: '2 Felder',
+      format: ageProfile.mode === 'tactical' ? '5 gegen 5 plus Joker' : '4 gegen 4 / 5 gegen 5',
     };
   }
 
   return {
-    ...focus.simple,
-    ziel: `${focus.simple.ziel} mit vielen Ballkontakten und einfachen Erfolgserlebnissen`,
-    ablauf: `${focus.simple.ablauf} Kurz erklären, vormachen und direkt spielen lassen.`,
-    coaching: `${focus.simple.coaching} Nur ein bis zwei Coachingpunkte gleichzeitig nutzen.`,
-    varianten: `${focus.simple.varianten} Regeln vereinfachen, wenn die Aktion stockt.`,
+    label: 'Viele Spieler',
+    setup: `${players} Spieler: zwei bis drei Felder parallel. Gruppen fest einteilen, klare Rotationen ansagen und Wartezeiten vermeiden.`,
+    fieldCount: '2-3 Felder',
+    format: ageProfile.mode === 'tactical' ? '7 gegen 7 plus Rotationen' : 'Stationstraining und 5 gegen 5',
   };
 }
 
-function getTrainerNote(schwerpunkt, ageProfile) {
+function getExerciseName(focus, ageProfile, slot, niveau) {
+  const focusData = focusLibrary[focus] || focusLibrary.Passspiel;
+  const mode = niveau === 'Leistung' && ageProfile.mode !== 'playful' ? 'tactical' : ageProfile.mode;
+  const names = slot === 'warmup' ? focusData.warmup : slot === 'technique' ? focusData.technique : focusData.game;
+  return names[mode] || names.technical;
+}
+
+function takeCoachingPoints(focus, ageProfile, niveau, offset = 0) {
+  const focusData = focusLibrary[focus] || focusLibrary.Passspiel;
+  const base = [...focusData.points, ...ageProfile.coachingTone];
+  const amount = niveau === 'Einsteiger' ? 3 : niveau === 'Fortgeschritten' ? 4 : 5;
+  return base.slice(offset).concat(base.slice(0, offset)).slice(0, amount);
+}
+
+function getSectionTarget(focus, index) {
+  const focusData = focusLibrary[focus] || focusLibrary.Passspiel;
+  if (index === 0) return `Körper aktivieren und erste ${focus.toLowerCase()}-Aktionen sammeln`;
+  if (index === 1) return focusData.goals[0];
+  if (index === 2) return focusData.goals[1];
+  if (index === 3) return focusData.goals[2];
+  return 'Belastung senken und wichtigsten Lernpunkt sichern';
+}
+
+function getSectionOrganisation(index, form, ageProfile, playerOrganisation) {
+  const focus = form.schwerpunkt;
+  const material = form.material?.trim() || 'Bälle, Hütchen, Markierungsteller';
+
+  if (index === 0) {
+    return `${playerOrganisation.fieldCount}. ${ageProfile.fieldHint}. Jeder Spieler startet mit Ball. Material: ${material}.`;
+  }
+
+  if (index === 1) {
+    return `${playerOrganisation.setup} Technikaktion nach 45-60 Sekunden rotieren. Material griffbereit an den Feldrändern.`;
+  }
+
+  if (index === 2) {
+    return `${playerOrganisation.format}. Schwerpunktregel: ${focus} muss vor dem Torabschluss sichtbar sein. Nach jeder Aktion sofort neu starten.`;
+  }
+
+  if (index === 3) {
+    return `${ageProfile.gameFormat}. Bei ${playerOrganisation.label.toLowerCase()} mit klarer Rotation und kurzer Trinkpause nach halber Zeit.`;
+  }
+
+  return 'Alle Spieler mit Ball im Kreis oder lockerem Feld. Kurz auslaufen, zwei Fragen stellen, Training positiv beenden.';
+}
+
+function getSectionFlow(index, form, ageProfile) {
+  const focus = form.schwerpunkt.toLowerCase();
+  const flows = [
+    `Freie Ballbewegung, dann Signalaufgaben. Nach 3 Minuten eine einfache ${focus}-Regel ergänzen.`,
+    'Vormachen, 2 Minuten frei üben lassen, dann kurze Korrektur und Tempo erhöhen.',
+    'Aktion startet immer mit Ball vom Trainer oder Startspieler. Nach Abschluss sofort Rollen wechseln.',
+    'Freies Spiel mit einer klaren Bonusregel. Nur kurz stoppen, wenn der Schwerpunkt nicht sichtbar wird.',
+    'Locker bewegen, Bälle einsammeln, ein positives Beispiel aus der Einheit nennen.',
+  ];
+
+  if (ageProfile.mode === 'playful') return flows[index].replace('Korrektur', 'Mini-Aufgabe');
+  if (ageProfile.mode === 'tactical') return flows[index].replace('Bonusregel', 'taktischen Trigger');
+  return flows[index];
+}
+
+function getTrainerNote(schwerpunkt, ageProfile, playerOrganisation) {
   const focusNotes = {
-    Passspiel: 'saubere offene Stellung und mutige Anschlussaktion nach dem Pass',
-    Dribbling: 'Kopf hoch, mutige Richtungswechsel und Beschleunigung nach der Finte',
-    Torabschluss: 'ruhige Vorbereitung, klare Zielentscheidung und Nachsetzen nach dem Schuss',
-    Umschalten: 'sofortige Reaktion nach Ballgewinn oder Ballverlust',
-    Koordination: 'saubere Bewegungsqualität vor hohem Tempo',
+    Passspiel: 'Passqualität, ersten Kontakt und Freilaufwinkel sichtbar machen.',
+    Dribbling: 'Mut im 1 gegen 1 belohnen und nach der Finte Tempo fordern.',
+    Torabschluss: 'Klare Zielwahl, sauberen ersten Kontakt und konsequentes Nachsetzen coachen.',
+    Umschalten: 'Die erste Reaktion nach Ballgewinn oder Ballverlust sofort einfordern.',
+    Koordination: 'Saubere Bewegungsqualität vor Geschwindigkeit setzen.',
   };
 
-  const ageNotes = {
-    playful: 'Heute zählt: viel Bewegung, viele Ballkontakte, kurze Erklärungen.',
-    technical: 'Heute zählt: saubere Technik, dann Anwendung unter leichtem Druck.',
-    tactical: 'Heute zählt: klare Auslöser erkennen und mit Tempo handeln.',
-  };
-
-  return `${ageNotes[ageProfile.mode]} Mein Hauptfokus: ${focusNotes[schwerpunkt] || 'eine klare Schwerpunktaktion sichtbar machen'}.`;
+  return `${ageProfile.label}. ${playerOrganisation.setup} Hauptfokus: ${focusNotes[schwerpunkt] || 'eine klare Schwerpunktaktion sichtbar machen'}`;
 }
 
 function createTrainingPlan(form, variant = 0) {
@@ -203,52 +282,36 @@ function createTrainingPlan(form, variant = 0) {
   const totalMinutes = parseInt(dauer, 10) || 90;
   const durations = getDurations(totalMinutes);
   const ageProfile = ageProfiles[alter] || ageProfiles.U11;
-  const focus = focusTemplates[schwerpunkt] || focusTemplates.Passspiel;
-  const template = getTemplateForAge(focus, ageProfile);
-  const teamSplit = splitPlayers(spieleranzahl);
+  const focusData = focusLibrary[schwerpunkt] || focusLibrary.Passspiel;
+  const playerOrganisation = getPlayerOrganisation(spieleranzahl, ageProfile);
   const materialText = material?.trim() || 'Bälle, Hütchen, Markierungsteller';
-  const variantSuffix = variant % 2 === 0
-    ? 'Starte mit niedriger Intensität und steigere die Anforderungen sichtbar.'
-    : 'Beginne mit freier Bewegung und führe die Schwerpunktregel erst nach zwei Minuten ein.';
+  const gameName = variant % 2 === 0
+    ? getExerciseName(schwerpunkt, ageProfile, 'game', niveau)
+    : `${getExerciseName(schwerpunkt, ageProfile, 'game', niveau)} mit Bonusregel`;
 
-  const plan = {
-    abschnitte: sectionNames.map((name, index) => ({
-      name,
+  const exerciseNames = [
+    getExerciseName(schwerpunkt, ageProfile, 'warmup', niveau),
+    getExerciseName(schwerpunkt, ageProfile, 'technique', niveau),
+    ageProfile.mode === 'playful' ? focusData.technique.playful : focusData.game.technical,
+    gameName,
+    'Team-Challenge und Lernpunkt sichern',
+  ];
+
+  return {
+    abschnitte: phaseLabels.map((phase, index) => ({
+      phase,
       dauer: durations[index],
+      exerciseName: exerciseNames[index],
+      ziel: getSectionTarget(schwerpunkt, index),
+      organisation: getSectionOrganisation(index, { ...form, material: materialText }, ageProfile, playerOrganisation),
+      coachingPoints: takeCoachingPoints(schwerpunkt, ageProfile, niveau, index),
+      ablauf: getSectionFlow(index, { ...form, material: materialText }, ageProfile),
+      varianten: index === 4
+        ? 'Penalty-Challenge, Spieler wählen Lieblingsaktion oder kurze Technikaufgabe für zuhause.'
+        : focusData.variants.slice(0, 3 + (niveau === 'Leistung' ? 1 : 0)),
       material: materialText,
-      ...[
-      {
-        ziel: `Körper und Kopf auf ${schwerpunkt.toLowerCase()} vorbereiten`,
-        ablauf: `Alle Spieler mit Ball im Feld. Dribbeln, passen, Richtung wechseln. Danach ein kurzes Reaktionsspiel passend für ${alter}. ${variantSuffix}`,
-        coaching: `${ageProfile.hint}. Auf aktive Körperhaltung und viele Ballaktionen achten.`,
-        varianten: 'Farbsignal, Partneraufgabe, Zusatzpunkt für schwachen Fuß oder kleine Fangform.',
-      },
-      {
-        ...template,
-        ablauf: `${template.ablauf} Für ca. ${spieleranzahl || 8} Spieler in zwei Gruppen aufbauen, damit kaum Wartezeit entsteht.`,
-        coaching: `${template.coaching} Niveau: ${niveau}.`,
-      },
-      {
-        ziel: `${template.ziel} in einer spielnahen Entscheidungssituation anwenden`,
-        ablauf: `${ageProfile.mainFormat} mit klarer Schwerpunktregel. Nach erfolgreicher Aktion sofort Richtung Zieltor weiterspielen.`,
-        coaching: `${template.coaching} Kurz stoppen, eine Lösung zeigen, sofort weiterspielen.`,
-        varianten: `${template.varianten} Gegnerdruck, Feldgröße und Kontaktzahl passend zum Team anpassen.`,
-      },
-      {
-        ziel: `Den Schwerpunkt ${schwerpunkt.toLowerCase()} im freien Spiel sichtbar machen`,
-        ablauf: `${ageProfile.game}. Bei ${teamSplit} zählt ein Treffer doppelt, wenn vorher der Schwerpunkt klar zu sehen war.`,
-        coaching: 'Wenig unterbrechen. Gute Aktionen sofort loben. Nach kurzen Pausen eine konkrete Frage stellen: Was war die beste Lösung?',
-        varianten: 'Bonusregel ändern, Joker einsetzen, Tore breiter stellen, Feld enger machen oder kurze Turnierform spielen.',
-      },
-      {
-        ziel: 'Belastung senken, Lernerfolg sichern und Training positiv beenden',
-        ablauf: 'Locker mit Ball auslaufen. Danach eine kurze Frage in die Runde: Was hat heute beim Schwerpunkt gut funktioniert?',
-        coaching: 'Ein positives Detail nennen. Eine einfache Ballaufgabe für zuhause mitgeben.',
-        varianten: 'Penalty-Challenge, ruhige Technikaufgabe oder Spieler wählen die beste Übung des Tages.',
-      },
-    ][index],
     })),
-    trainerNote: getTrainerNote(schwerpunkt, ageProfile),
+    trainerNote: getTrainerNote(schwerpunkt, ageProfile, playerOrganisation),
     meta: {
       alter,
       totalMinutes,
@@ -257,10 +320,11 @@ function createTrainingPlan(form, variant = 0) {
       niveau,
       material: materialText,
       ageLabel: ageProfile.label,
+      organisation: playerOrganisation.label,
+      fieldCount: playerOrganisation.fieldCount,
+      format: playerOrganisation.format,
     },
   };
-
-  return plan;
 }
 
 export default function App() {
@@ -270,10 +334,9 @@ export default function App() {
 
   const handleGenerate = (formData) => {
     const nextVariant = 0;
-    const newPlan = createTrainingPlan(formData, nextVariant);
     setLastFormData(formData);
     setVariant(nextVariant);
-    setPlan(newPlan);
+    setPlan(createTrainingPlan(formData, nextVariant));
   };
 
   const handleRegenerate = () => {
@@ -284,22 +347,35 @@ export default function App() {
   };
 
   return (
-    <div className="container">
-      <header className="app-header">
-        <span className="eyebrow">Für Jugendtrainer</span>
-        <h1>Fußball Training AI</h1>
-        <p className="subtitle">
-          Erstelle schnell einen passenden Trainingsplan für dein Team.
-        </p>
+    <div className="app-shell">
+      <header className="hero">
+        <div className="hero-field" aria-hidden="true" />
+        <div className="hero-content">
+          <div className="hero-badges">
+            <span>Demo v1</span>
+            <span>Für Jugendtrainer</span>
+          </div>
+          <h1>Trainingsplan in 30 Sekunden</h1>
+          <p className="hero-subline">Praxisnahe Einheiten für Jugendtrainer von U7 bis U17.</p>
+          <p className="hero-trust">Ohne Login · Ohne Datenspeicherung · Direkt nutzbar</p>
+        </div>
       </header>
-      <main>
+
+      <main className="layout">
         <TrainingForm onGenerate={handleGenerate} />
-        {plan && <TrainingPlan plan={plan} onRegenerate={handleRegenerate} />}
+        {plan ? (
+          <TrainingPlan plan={plan} onRegenerate={handleRegenerate} />
+        ) : (
+          <section className="empty-plan" aria-label="Start ohne Trainingsplan">
+            <span className="section-kicker">Noch kein Plan</span>
+            <h2>Wähle ein Preset oder baue deine Einheit selbst.</h2>
+            <p>Der fertige Ablauf erscheint hier als platznaher Session-Flow mit Organisation, Coachingpunkten und Material.</p>
+          </section>
+        )}
       </main>
-      <footer>
-        <small>
-          Läuft lokal im Browser. Es werden keine Daten gespeichert.
-        </small>
+
+      <footer className="site-footer">
+        <small>Läuft lokal im Browser. Kein Login, kein Backend, keine Datenspeicherung.</small>
       </footer>
     </div>
   );
