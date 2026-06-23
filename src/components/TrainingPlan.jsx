@@ -16,7 +16,7 @@ function formatPlanAsText(plan) {
   ].join('\n');
 
   const sections = plan.abschnitte.map((section, index) => (
-    `${index + 1}. ${section.dauer} Min - ${section.exerciseName}\n` +
+    `${index + 1}. ${section.dauer}' - ${section.exerciseName}\n` +
     `Phase: ${section.phase}\n` +
     `Ziel: ${section.ziel}\n` +
     `Organisation: ${section.organisation}\n` +
@@ -49,13 +49,8 @@ export default function TrainingPlan({ plan, onRegenerate }) {
   }
 
   return (
-    <section className="plan-section printable-plan">
-      <div className="plan-topbar">
-        <div>
-          <span className="section-kicker">Session-Flow</span>
-          <h2>Dein Trainingsplan</h2>
-          <p>{plan.meta.ageLabel}</p>
-        </div>
+    <section className="training-sheet printable-plan">
+      <div className="sheet-toolbar no-print">
         <div className="plan-actions no-print">
           <button type="button" className="secondary-button" onClick={onRegenerate}>Beispiel variieren</button>
           <button type="button" className="secondary-button" onClick={handleCopy}>
@@ -67,72 +62,54 @@ export default function TrainingPlan({ plan, onRegenerate }) {
 
       {copyState === 'error' ? <p className="copy-error no-print">Kopieren ist hier nicht verfügbar.</p> : null}
 
-      <div className="session-preview">
-        <span><strong>{plan.meta.alter}</strong> Altersklasse</span>
-        <span><strong>{plan.meta.schwerpunkt}</strong> Schwerpunkt</span>
-        <span><strong>{plan.meta.totalMinutes} min</strong> Dauer</span>
-        <span><strong>{plan.meta.fieldCount}</strong> Organisation</span>
+      <header className="sheet-header">
+        <span className="section-kicker">Trainingszettel</span>
+        <h2>{plan.meta.alter} · {plan.meta.schwerpunkt} · {plan.meta.totalMinutes} Minuten · {plan.meta.spieleranzahl} Spieler</h2>
+        <p><strong>Organisation:</strong> {plan.meta.shortSetup}</p>
+      </header>
+
+      <div className="flow-strip" aria-label="Ablauf">
+        {plan.abschnitte.map((section) => (
+          <span key={`${section.phase}-${section.dauer}`}>
+            <strong>{section.dauer}'</strong> {section.phase}
+          </span>
+        ))}
       </div>
 
-      <div className="timeline">
+      <div className="sheet-sections">
         {plan.abschnitte.map((section, index) => (
-          <article key={`${section.phase}-${section.exerciseName}`} className="timeline-item">
-            <div className="timeline-marker">
-              <span>{index + 1}</span>
+          <article key={`${section.phase}-${section.exerciseName}`} className="sheet-card">
+            <header className="sheet-card-head">
+              <div className="phase-stack">
+                <span className="duration-badge">{section.dauer}'</span>
+                <span className="phase-label">{section.phase}</span>
+              </div>
+              <div>
+                <p className="sheet-index">{index + 1}</p>
+                <h3>{section.exerciseName}</h3>
+              </div>
+            </header>
+
+            <div className="sheet-card-body">
+              <p><strong>Ziel:</strong> {section.ziel}</p>
+              <p><strong>Organisation:</strong> {section.organisation}</p>
+              <ul className="coach-list">
+                {section.coachingPoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+              <p className="material-line"><strong>Material:</strong> {section.material}</p>
             </div>
 
-            <div className="timeline-card">
-              <header className="timeline-header">
-                <div>
-                  <span className="phase-label">{section.phase}</span>
-                  <h3>{section.exerciseName}</h3>
-                </div>
-                <span className="duration-badge">{section.dauer} min</span>
-              </header>
-
-              <div className="quick-grid">
-                <div>
-                  <span className="micro-label">Ziel</span>
-                  <p>{section.ziel}</p>
-                </div>
-                <div>
-                  <span className="micro-label">Organisation</span>
-                  <p>{section.organisation}</p>
-                </div>
-              </div>
-
-              <div className="coaching-box">
-                <span className="micro-label">Coachings</span>
-                <ul>
-                  {section.coachingPoints.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="material-line">
-                <span>Material</span>
-                <p>{section.material}</p>
-              </div>
-
-              <details className="detail-panel">
-                <summary>Ablauf, Varianten und Trainerhinweis</summary>
-                <div className="detail-grid">
-                  <div>
-                    <strong>Ablauf</strong>
-                    <p>{section.ablauf}</p>
-                  </div>
-                  <div>
-                    <strong>Varianten</strong>
-                    <ul>
-                      {(Array.isArray(section.varianten) ? section.varianten : [section.varianten]).map((variant) => (
-                        <li key={variant}>{variant}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </details>
-            </div>
+            <details className="detail-panel">
+              <summary>Ablauf & Varianten</summary>
+              <p>{section.ablauf}</p>
+              <ul>
+                {(Array.isArray(section.varianten) ? section.varianten : [section.varianten]).map((variant) => (
+                  <li key={variant}>{variant}</li>
+                ))}
+              </ul>
+            </details>
           </article>
         ))}
       </div>

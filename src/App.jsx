@@ -150,7 +150,7 @@ const focusLibrary = {
   },
 };
 
-const phaseLabels = ['Aktivierung', 'Technikblock', 'Spielform 1', 'Spielform 2', 'Cool-down'];
+const phaseLabels = ['Aktivierung', 'Technik', 'Spielform', 'Abschlussspiel', 'Abschluss'];
 
 function getDurations(totalMinutes) {
   const safeTotal = Math.max(30, totalMinutes);
@@ -182,6 +182,7 @@ function getPlayerOrganisation(count, ageProfile) {
     return {
       label: 'Kleine Gruppe',
       setup: `${players} Spieler: ein kleines Feld, viele Wiederholungen, kurze Wege. Nutze 2 gegen 2 oder 3 gegen 3 und rotiere nach jeder Aktion.`,
+      shortSetup: '1 Feld / 2-3 Teams / schnelle Rotation',
       fieldCount: '1 Feld',
       format: ageProfile.mode === 'playful' ? '2 gegen 2 / 3 gegen 3' : '3 gegen 3 plus Joker',
     };
@@ -191,6 +192,7 @@ function getPlayerOrganisation(count, ageProfile) {
     return {
       label: 'Zwei Gruppen',
       setup: `${players} Spieler: zwei Gruppen parallel aufbauen. Rotationsspieler einplanen, damit jeder nach kurzer Pause wieder aktiv ist.`,
+      shortSetup: '2 Felder / 2 Gruppen / Rotationsspieler',
       fieldCount: '2 Felder',
       format: ageProfile.mode === 'tactical' ? '5 gegen 5 plus Joker' : '4 gegen 4 / 5 gegen 5',
     };
@@ -199,6 +201,7 @@ function getPlayerOrganisation(count, ageProfile) {
   return {
     label: 'Viele Spieler',
     setup: `${players} Spieler: zwei bis drei Felder parallel. Gruppen fest einteilen, klare Rotationen ansagen und Wartezeiten vermeiden.`,
+    shortSetup: '2-3 Felder / 3 Gruppen / Wartezeiten vermeiden',
     fieldCount: '2-3 Felder',
     format: ageProfile.mode === 'tactical' ? '7 gegen 7 plus Rotationen' : 'Stationstraining und 5 gegen 5',
   };
@@ -214,7 +217,7 @@ function getExerciseName(focus, ageProfile, slot, niveau) {
 function takeCoachingPoints(focus, ageProfile, niveau, offset = 0) {
   const focusData = focusLibrary[focus] || focusLibrary.Passspiel;
   const base = [...focusData.points, ...ageProfile.coachingTone];
-  const amount = niveau === 'Einsteiger' ? 3 : niveau === 'Fortgeschritten' ? 4 : 5;
+  const amount = 3;
   return base.slice(offset).concat(base.slice(0, offset)).slice(0, amount);
 }
 
@@ -229,25 +232,24 @@ function getSectionTarget(focus, index) {
 
 function getSectionOrganisation(index, form, ageProfile, playerOrganisation) {
   const focus = form.schwerpunkt;
-  const material = form.material?.trim() || 'Bälle, Hütchen, Markierungsteller';
 
   if (index === 0) {
-    return `${playerOrganisation.fieldCount}. ${ageProfile.fieldHint}. Jeder Spieler startet mit Ball. Material: ${material}.`;
+    return `${playerOrganisation.fieldCount}. Jeder Spieler mit Ball, kleine Felder, sofort starten.`;
   }
 
   if (index === 1) {
-    return `${playerOrganisation.setup} Technikaktion nach 45-60 Sekunden rotieren. Material griffbereit an den Feldrändern.`;
+    return `${playerOrganisation.shortSetup}. Technikaktion nach 45-60 Sekunden rotieren.`;
   }
 
   if (index === 2) {
-    return `${playerOrganisation.format}. Schwerpunktregel: ${focus} muss vor dem Torabschluss sichtbar sein. Nach jeder Aktion sofort neu starten.`;
+    return `${playerOrganisation.format}. Schwerpunktregel: ${focus} vor Torabschluss oder Punktgewinn.`;
   }
 
   if (index === 3) {
-    return `${ageProfile.gameFormat}. Bei ${playerOrganisation.label.toLowerCase()} mit klarer Rotation und kurzer Trinkpause nach halber Zeit.`;
+    return `${ageProfile.gameFormat}. Klare Rotation, kurze Coachingstopps.`;
   }
 
-  return 'Alle Spieler mit Ball im Kreis oder lockerem Feld. Kurz auslaufen, zwei Fragen stellen, Training positiv beenden.';
+  return 'Alle Spieler mit Ball. Kurz auslaufen, Lernpunkt nennen, positiv beenden.';
 }
 
 function getSectionFlow(index, form, ageProfile) {
@@ -274,7 +276,7 @@ function getTrainerNote(schwerpunkt, ageProfile, playerOrganisation) {
     Koordination: 'Saubere Bewegungsqualität vor Geschwindigkeit setzen.',
   };
 
-  return `${ageProfile.label}. ${playerOrganisation.setup} Hauptfokus: ${focusNotes[schwerpunkt] || 'eine klare Schwerpunktaktion sichtbar machen'}`;
+  return `${ageProfile.label}. ${playerOrganisation.shortSetup}. Fokus: ${focusNotes[schwerpunkt] || 'eine klare Schwerpunktaktion sichtbar machen'}`;
 }
 
 function createTrainingPlan(form, variant = 0) {
@@ -323,6 +325,7 @@ function createTrainingPlan(form, variant = 0) {
       organisation: playerOrganisation.label,
       fieldCount: playerOrganisation.fieldCount,
       format: playerOrganisation.format,
+      shortSetup: playerOrganisation.shortSetup,
     },
   };
 }
@@ -348,17 +351,12 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <header className="hero">
-        <div className="hero-field" aria-hidden="true" />
-        <div className="hero-content">
-          <div className="hero-badges">
-            <span>Demo v1</span>
-            <span>Für Jugendtrainer</span>
-          </div>
+      <header className="app-header no-print">
+        <div>
+          <p className="app-name">Fußball Training AI</p>
           <h1>Trainingsplan in 30 Sekunden</h1>
-          <p className="hero-subline">Praxisnahe Einheiten für Jugendtrainer von U7 bis U17.</p>
-          <p className="hero-trust">Ohne Login · Ohne Datenspeicherung · Direkt nutzbar</p>
         </div>
+        <p className="trust-line">Ohne Login · lokal im Browser · direkt nutzbar</p>
       </header>
 
       <main className="layout">
@@ -367,9 +365,9 @@ export default function App() {
           <TrainingPlan plan={plan} onRegenerate={handleRegenerate} />
         ) : (
           <section className="empty-plan" aria-label="Start ohne Trainingsplan">
-            <span className="section-kicker">Noch kein Plan</span>
-            <h2>Wähle ein Preset oder baue deine Einheit selbst.</h2>
-            <p>Der fertige Ablauf erscheint hier als platznaher Session-Flow mit Organisation, Coachingpunkten und Material.</p>
+            <span className="section-kicker">Trainingszettel</span>
+            <h2>Noch kein Plan.</h2>
+            <p>Preset wählen oder Werte setzen. Danach steht hier der kompakte Ablauf für den Platz.</p>
           </section>
         )}
       </main>
