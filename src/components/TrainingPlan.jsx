@@ -63,9 +63,27 @@ export default function TrainingPlan({ plan, onRegenerate }) {
       {copyState === 'error' ? <p className="copy-error no-print">Kopieren ist hier nicht verfügbar.</p> : null}
 
       <header className="sheet-header">
-        <span className="section-kicker">Trainingszettel</span>
-        <h2>{plan.meta.alter} · {plan.meta.schwerpunkt} · {plan.meta.totalMinutes} Minuten · {plan.meta.spieleranzahl} Spieler</h2>
-        <p><strong>Organisation:</strong> {plan.meta.shortSetup}</p>
+        <div>
+          <span className="section-kicker">Trainingszettel</span>
+          <h2>{plan.meta.alter} · {plan.meta.schwerpunkt} · {plan.meta.totalMinutes} Minuten · {plan.meta.spieleranzahl} Spieler</h2>
+          <p><strong>Organisation:</strong> {plan.meta.shortSetup}</p>
+          <p className="library-note">Aus lokaler Übungsbibliothek · {plan.meta.libraryCount}+ Übungen · keine Datenspeicherung</p>
+        </div>
+        <svg className="mini-pitch" viewBox="0 0 220 132" aria-hidden="true">
+          <rect x="8" y="8" width="204" height="116" rx="8" />
+          <line x1="110" y1="8" x2="110" y2="124" />
+          <circle cx="110" cy="66" r="24" />
+          <rect x="8" y="42" width="32" height="48" />
+          <rect x="180" y="42" width="32" height="48" />
+          <circle className="marker marker-a" cx="58" cy="38" r="7" />
+          <circle className="marker marker-a" cx="76" cy="82" r="7" />
+          <circle className="marker marker-a" cx="116" cy="58" r="7" />
+          <circle className="marker marker-b" cx="154" cy="42" r="7" />
+          <circle className="marker marker-b" cx="166" cy="88" r="7" />
+          <path className="pass-line" d="M61 39 C84 48, 96 53, 112 58" />
+          <path className="run-line" d="M118 58 C138 52, 148 47, 154 42" />
+          <path className="arrow-head" d="M154 42 l-10 -2 l5 9" />
+        </svg>
       </header>
 
       <div className="flow-strip" aria-label="Ablauf">
