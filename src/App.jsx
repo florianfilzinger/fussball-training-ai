@@ -250,13 +250,17 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="app-header no-print">
-        <div>
-          <p className="app-name">Fußball Trainingsplaner</p>
-          <h1>Trainingsplan in 30 Sekunden</h1>
+        <div className="product-title">
+          <p className="app-name">Session Planner</p>
+          <h1>Fußball Trainingsplaner</h1>
+          <p>Trainingspläne für Jugendtrainer in wenigen Minuten.</p>
         </div>
-        <p className="trust-line">
-          {libraryStats.exerciseCount} Übungen · ohne Login · lokal im Browser
-        </p>
+        <div className="top-meta" aria-label="Produktinformationen">
+          <span>{libraryStats.exerciseCount} Übungen</span>
+          <span>Lokal im Browser</span>
+          <span>Kein Login</span>
+          <span>PDF-fähig</span>
+        </div>
         <svg className="tactic-doodle" viewBox="0 0 180 92" aria-hidden="true">
           <rect x="6" y="6" width="168" height="80" rx="8" />
           <line x1="90" y1="6" x2="90" y2="86" />
@@ -277,9 +281,14 @@ export default function App() {
           <TrainingPlan plan={plan} onRegenerate={handleRegenerate} />
         ) : (
           <section className="empty-plan" aria-label="Start ohne Trainingsplan">
-            <span className="section-kicker">Trainingszettel</span>
-            <h2>Noch kein Plan.</h2>
-            <p>Preset wählen oder Werte setzen. Danach wählt die lokale Übungsbibliothek passende Trainingsbausteine.</p>
+            <div className="empty-map" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <span className="section-kicker">Session Board</span>
+            <h2>Noch keine Einheit erstellt.</h2>
+            <p>Session Setup ausfüllen oder Preset wählen. Der Trainingsplan erscheint hier als strukturiertes Coaching Board.</p>
           </section>
         )}
       </main>

@@ -89,9 +89,13 @@ export default function TrainingForm({ onGenerate }) {
     <section className="builder-card no-print">
       <div className="builder-head">
         <div>
-          <span className="section-kicker">Builder</span>
-          <h2>Einheit vorbereiten</h2>
+          <span className="section-kicker">Session Setup</span>
+          <h2>Einheit konfigurieren</h2>
         </div>
+      </div>
+
+      <div className="preset-block">
+        <p>Quick Presets</p>
         <div className="preset-row" aria-label="Schnell-Presets">
           {presets.map((preset) => (
             <button key={preset.label} type="button" className="preset-button" onClick={() => applyPreset(preset.values)}>
@@ -102,21 +106,90 @@ export default function TrainingForm({ onGenerate }) {
       </div>
 
       <form onSubmit={handleSubmit} className="training-form" noValidate>
-        <div className="form-grid top-fields">
-          <label className="form-group" htmlFor="alter">
-            <span>Alter</span>
-            <select id="alter" value={form.alter} onChange={(event) => updateField('alter', event.target.value)}>
-              <option value="U7">U7</option>
-              <option value="U9">U9</option>
-              <option value="U11">U11</option>
-              <option value="U13">U13</option>
-              <option value="U15">U15</option>
-              <option value="U17">U17</option>
-            </select>
-          </label>
+        <div className="setup-section">
+          <div className="setup-title">
+            <span>01</span>
+            <h3>Team</h3>
+          </div>
+          <div className="form-grid team-fields">
+            <label className="form-group" htmlFor="alter">
+              <span>Altersklasse</span>
+              <select id="alter" value={form.alter} onChange={(event) => updateField('alter', event.target.value)}>
+                <option value="U7">U7</option>
+                <option value="U9">U9</option>
+                <option value="U11">U11</option>
+                <option value="U13">U13</option>
+                <option value="U15">U15</option>
+                <option value="U17">U17</option>
+              </select>
+            </label>
 
+            <label className="form-group" htmlFor="spieleranzahl">
+              <span>Spieler</span>
+              <input
+                type="number"
+                id="spieleranzahl"
+                min="4"
+                max="24"
+                value={form.spieleranzahl}
+                onChange={(event) => updateField('spieleranzahl', event.target.value)}
+                aria-invalid={Boolean(errors.spieleranzahl)}
+              />
+              {errors.spieleranzahl ? <small className="form-error">{errors.spieleranzahl}</small> : null}
+            </label>
+
+            <label className="form-group" htmlFor="niveau">
+              <span>Niveau</span>
+              <select id="niveau" value={form.niveau} onChange={(event) => updateField('niveau', event.target.value)}>
+                <option value="Einsteiger">Einsteiger</option>
+                <option value="Fortgeschritten">Fortgeschritten</option>
+                <option value="Leistung">Leistung</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="setup-section">
+          <div className="setup-title">
+            <span>02</span>
+            <h3>Trainingsrahmen</h3>
+          </div>
+          <div className="form-grid frame-fields">
+            <label className="form-group" htmlFor="dauer">
+              <span>Dauer</span>
+              <input
+                type="number"
+                id="dauer"
+                min="30"
+                step="5"
+                value={form.dauer}
+                onChange={(event) => updateField('dauer', event.target.value)}
+                aria-invalid={Boolean(errors.dauer)}
+              />
+              {errors.dauer ? <small className="form-error">{errors.dauer}</small> : null}
+            </label>
+
+            <label className="form-group material-field" htmlFor="material">
+              <span>Material</span>
+              <input
+                type="text"
+                id="material"
+                value={form.material}
+                onChange={(event) => updateField('material', event.target.value)}
+                aria-invalid={Boolean(errors.material)}
+              />
+              {errors.material ? <small className="form-error">{errors.material}</small> : null}
+            </label>
+          </div>
+        </div>
+
+        <div className="setup-section">
+          <div className="setup-title">
+            <span>03</span>
+            <h3>Trainingsziel</h3>
+          </div>
           <label className="form-group" htmlFor="schwerpunkt">
-            <span>Ziel</span>
+            <span>Schwerpunkt</span>
             <select id="schwerpunkt" value={form.schwerpunkt} onChange={(event) => updateField('schwerpunkt', event.target.value)}>
               <option value="Passspiel">Passspiel</option>
               <option value="Dribbling">Dribbling</option>
@@ -124,57 +197,6 @@ export default function TrainingForm({ onGenerate }) {
               <option value="Umschalten">Umschalten</option>
               <option value="Koordination">Koordination</option>
             </select>
-          </label>
-
-          <label className="form-group" htmlFor="niveau">
-            <span>Niveau</span>
-            <select id="niveau" value={form.niveau} onChange={(event) => updateField('niveau', event.target.value)}>
-              <option value="Einsteiger">Einsteiger</option>
-              <option value="Fortgeschritten">Fortgeschritten</option>
-              <option value="Leistung">Leistung</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="form-grid bottom-fields">
-          <label className="form-group" htmlFor="spieleranzahl">
-            <span>Spieler</span>
-            <input
-              type="number"
-              id="spieleranzahl"
-              min="4"
-              max="24"
-              value={form.spieleranzahl}
-              onChange={(event) => updateField('spieleranzahl', event.target.value)}
-              aria-invalid={Boolean(errors.spieleranzahl)}
-            />
-            {errors.spieleranzahl ? <small className="form-error">{errors.spieleranzahl}</small> : null}
-          </label>
-
-          <label className="form-group" htmlFor="dauer">
-            <span>Minuten</span>
-            <input
-              type="number"
-              id="dauer"
-              min="30"
-              step="5"
-              value={form.dauer}
-              onChange={(event) => updateField('dauer', event.target.value)}
-              aria-invalid={Boolean(errors.dauer)}
-            />
-            {errors.dauer ? <small className="form-error">{errors.dauer}</small> : null}
-          </label>
-
-          <label className="form-group material-field" htmlFor="material">
-            <span>Material</span>
-            <input
-              type="text"
-              id="material"
-              value={form.material}
-              onChange={(event) => updateField('material', event.target.value)}
-              aria-invalid={Boolean(errors.material)}
-            />
-            {errors.material ? <small className="form-error">{errors.material}</small> : null}
           </label>
         </div>
 
